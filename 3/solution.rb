@@ -39,11 +39,11 @@ puts "Got readings epsilon=#{epsilon}, gamma=#{gamma}: #{epsilon * gamma}"
 def get_life_support_rating(rows, col_idx: 0, &value_picker)
   value = value_picker.(rows.transpose[col_idx].tally)
 
-  selected = rows.select { _1[col_idx] == value }
-  if selected.count > 1
+  case rows.select { _1[col_idx] == value }
+  in [row]
+    row.join.to_i(2)
+  in [*] => selected
     get_life_support_rating(selected, col_idx: col_idx + 1, &value_picker)
-  else
-    selected.first.join.to_i(2)
   end
 end
 
