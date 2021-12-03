@@ -30,7 +30,7 @@ def get_power_rating(rows, &value_picker)
 end
 
 epsilon = get_power_rating(rows) { _1.max_by { |k, v| v }.first }
-gamma = get_power_rating(rows) { _1.min_by { |k, v| v }.first }
+gamma   = get_power_rating(rows) { _1.min_by { |k, v| v }.first }
 
 puts "Got readings epsilon=#{epsilon}, gamma=#{gamma}: #{epsilon * gamma}"
 
@@ -47,9 +47,7 @@ def get_life_support_rating(rows, col_idx: 0, &value_picker)
   end
 end
 
-
 oxygen_generator = get_life_support_rating(rows) { _1[1] >= _1[0] ? 1 : 0 }
-
-co2_scrubber = get_life_support_rating(rows) { _1[0] <= _1[1] ? 0 : 1 }
+co2_scrubber     = get_life_support_rating(rows) { _1[0] <= _1[1] ? 0 : 1 }
 
 puts "Got readings oxygen_generator=#{oxygen_generator}, co2_scrubber=#{co2_scrubber}: #{oxygen_generator * co2_scrubber}"
