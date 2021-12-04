@@ -105,16 +105,10 @@ input = %w[
 draws = input[0].split(",").map { Integer(_1) }
 boards = input[1..-1].map { Integer(_1) }.each_slice(5).each_slice(5).to_a
 
-drawn = []
-scores = []
-until draws.empty? || boards.empty?
-  drawn << draws.shift
-
+scores = draws.each_index.map { draws[0.._1] }.each_with_object([]) do |drawn, scores|
   boards.reject! do |board|
-    next unless board.any? { |row| (row & drawn) == row } || board.transpose.any? { |col| (col & drawn) == col }
-    scores << (board.flatten - drawn).sum * drawn.last
+    scores << ((board.flatten - drawn).sum * drawn.last) if (board + board.transpose).any? { (_1 & drawn) == _1 }
   end
 end
 
-puts "First bingo had score: #{scores.first}"
-puts "Last bingo had score: #{scores.last}"
+puts "First score: #{scores.first}, Last score #{scores.last}"
