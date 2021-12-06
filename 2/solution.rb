@@ -26,7 +26,7 @@ parse = ->(cmd_and_offset) {
   cmd = cmd_and_offset[0]
   offset = Integer(cmd_and_offset[1])
   case [cmd, offset]
-  in ["forward", x] then [x.to_i, 0]
+  in ["forward", x] then [x, 0]
   in ["up", y] then [0, -y]
   in ["down", y] then [0, y]
   end
