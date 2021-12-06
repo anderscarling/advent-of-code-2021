@@ -5,16 +5,16 @@ INPUT
 # Part 1
 
 fishes = input.split(",").map { Integer(_1) }
-80.times do |n|
-  fishes = fishes.flat_map { (_1 - 1) >= 0 ? [_1 - 1] : [6, 8] }
+
+fishes80 = 80.times.reduce(fishes) do |memo|
+  memo.flat_map { (_1 - 1) >= 0 ? [_1 - 1] : [6, 8] }
 end
-puts "Count after 80 iterations: #{fishes.count}"
+puts "Count after 80 iterations: #{fishes80.count}"
 
 # Part 2
 
-fishes = input.split(",").map { Integer(_1) }.tally
-256.times do |n|
-  fishes = fishes.each_with_object(Hash.new { |h, k| h[k] = 0 }) do |(n, c), new_fishes|
+fishes256 = 256.times.reduce(fishes.tally) do |memo|
+  memo.each_with_object(Hash.new { |h, k| h[k] = 0 }) do |(n, c), new_fishes|
     if (n - 1) >= 0
       new_fishes[(n - 1)] += c
     else
@@ -23,4 +23,4 @@ fishes = input.split(",").map { Integer(_1) }.tally
     end
   end
 end
-puts "Count after 256 iterations: #{fishes.values.sum}"
+puts "Count after 256 iterations: #{fishes256.values.sum}"
