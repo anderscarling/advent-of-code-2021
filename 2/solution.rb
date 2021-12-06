@@ -22,18 +22,16 @@ input = %w[
   up 1 down 6 up 3 forward 8 down 6 forward 6 down 5 down 4 forward 3 up 1 forward 5 forward 5 forward 2 up 9 forward 3 down 5 up 3 up 4 down 7 down 4 up 3 up 3 forward 2 up 2 forward 8 down 9 down 1 up 8 down 2 up 4 forward 9 up 1 down 8 forward 3 up 9 down 7 down 5 down 9 down 1 down 2 down 9 down 4 down 8 down 8 down 9 down 2 down 6 down 9 forward 8
 ]
 
-parse = ->(cmd_and_offset) {
-  cmd = cmd_and_offset[0]
-  offset = Integer(cmd_and_offset[1])
-  case [cmd, offset]
+commands = input.each_slice(2).map do |(cmd, offset)|
+  case [cmd, Integer(offset)]
   in ["forward", x] then [x, 0]
   in ["up", y] then [0, -y]
   in ["down", y] then [0, y]
   end
-}
+end
 
 # Part 1
-(x, y) = input.each_slice(2).map(&parse).inject([0, 0]) do |(horizontal, depth), (change_horizontal, change_depth)|
+(x, y) = commands.inject([0, 0]) do |(horizontal, depth), (change_horizontal, change_depth)|
   [
     horizontal + change_horizontal,
     depth + change_depth
@@ -42,7 +40,7 @@ end
 puts("Resulting position (#{x}, #{y}): #{x * y}")
 
 # Part 2
-(x, y, aim) = input.each_slice(2).map(&parse).inject([0, 0, 0]) do |(horizontal, depth, aim), (change_horizontal, change_aim)|
+(x, y, aim) = commands.inject([0, 0, 0]) do |(horizontal, depth, aim), (change_horizontal, change_aim)|
   [
     horizontal + change_horizontal,
     depth + (change_horizontal * aim),
