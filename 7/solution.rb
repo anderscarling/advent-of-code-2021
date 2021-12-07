@@ -8,8 +8,8 @@ puts "Cheapest fuel consumption is #{fuel} (at #{pos})"
 
 # Part 2
 
-costs = (crabs.min..crabs.max).map { (crabs.max - _1) }.each_with_object({}) { _2[_1] = 0.upto(_1).sum }
-outcomes = (crabs.min..crabs.max).map { |pos| [pos, crabs.map { costs.fetch((pos - _1).abs) }.sum] }
+def triangular(n)= (n * (n + 1)) / 2
+outcomes = (crabs.min..crabs.max).map { |pos| [pos, crabs.map { triangular((pos - _1).abs) }.sum] }
 pos, fuel = outcomes.min_by(&:last)
 puts "Cheapest fuel consumption is #{fuel} (at #{pos})"
 
