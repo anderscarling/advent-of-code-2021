@@ -1,12 +1,42 @@
 input = DATA.each_line.map { |l| l.strip.each_char.map { Integer(_1) } }
 
-def lowpoints_on_line(line, lineIdx) = ([Float::INFINITY] + line + [Float::INFINITY]).each_with_index.each_cons(3).map { |(a, _), (b, idx), (c, _)|  (b < a && b < c) ? [lineIdx, (idx - 1)] : nil }.compact
-candidates_by_line = input.each_with_index.flat_map { lowpoints_on_line(_1, _2) }
-candidates_bv_col = input.transpose.each_with_index.flat_map { lowpoints_on_line(_1, _2).map(&:reverse) }
+Coord = Struct.new(:line, :col, keyword_init: true) do
+  def reverse!
+    self.line, self.col = self.col, self.line
+  end
+end
 
-lowpoints = (candidates_bv_col & candidates_by_line).map { |coord| [coord, input.dig(*coord)] }.to_h
+# Part 1
+
+def lowpoints_on_line(line, lineIdx) = ([Float::INFINITY] + line + [Float::INFINITY]).each_with_index.each_cons(3).select { |(a, _), (b, _), (c, _)|  (b < a && b < c) }.map { |_, (_, idx), _| Coord.new(line: lineIdx, col: idx - 1) }
+lowpoint_candidates_by_line = input.each_with_index.flat_map { lowpoints_on_line(_1, _2) }
+lowpoint_candidates_by_col = input.transpose.each_with_index.flat_map { lowpoints_on_line(_1, _2).each(&:reverse!) }
+
+lowpoints = (lowpoint_candidates_by_line & lowpoint_candidates_by_col).map { |coord| [coord, input.dig(*coord)] }.to_h
 
 puts "Risk level of lowpoints is: #{lowpoints.values.map { _1 + 1 }.sum}"
+
+# Part 2
+
+def basins_on_line(line, lineIdx) = line.each_with_index.to_a.each_with_object([[]]) do |(value, idx), results|
+  if value == 9
+    results << [] unless results.last.empty?
+  else
+    results.last << Coord.new(line: lineIdx, col: idx)
+  end
+end
+basins_by_line = input.each_with_index.flat_map { basins_on_line(_1, _2) }.reject(&:empty?)
+basins_by_col = input.transpose.each_with_index.flat_map { basins_on_line(_1, _2).each { |basin| basin.each(&:reverse!) } }.reject(&:empty?)
+
+grouped_basins = (basins_by_line + basins_by_col).each_with_object([]) do |basin, grouped|
+  grouped.select { (_1 & (basin)).count > 0 }.each do
+    grouped.delete(_1)
+    basin.concat(_1).uniq!
+  end
+
+  grouped << basin
+end
+puts "Product of biggest basins are: #{grouped_basins.sort_by(&:count).last(3).map(&:count).inject(:*)}"
 
 __END__
 5456898789432369879876542123489327657987856789656799875436567999109876543212345679832223569876567892
