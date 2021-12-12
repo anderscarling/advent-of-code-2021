@@ -1,7 +1,8 @@
 CONNECTIONS = DATA.read.each_line.map { _1.strip.split("-") }.then { _1 + _1.map(&:reverse) }
 
-def find_paths(&should_visit)
-  queue = CONNECTIONS.select { |a, b| a == 'start' }
+def find_paths(&should_revisit)
+  queue = []
+  queue << ['start']
 
   found = []
   while path = queue.pop
@@ -10,8 +11,8 @@ def find_paths(&should_visit)
       next
     end
 
-    next_steps = CONNECTIONS
-      .select { |a, b| a == path.last && should_visit.call(b, path) }
+    CONNECTIONS
+      .select { |a, b| a == path.last && (!path.include?(b) || should_revisit.call(b, path)) }
       .map    { |a, b| path.dup << b }
       .each   { queue << _1 }
   end
@@ -21,7 +22,7 @@ end
 
 # Part 1
 
-paths_pt1 = find_paths { |cave, path| cave =~ /[[:upper:]]/ || !path.include?(cave) }
+paths_pt1 = find_paths { |cave, path| cave =~ /[[:upper:]]/ }
 puts "Found #{paths_pt1.count} paths when revisiting no small caves"
 
 # Part 2
@@ -29,8 +30,8 @@ puts "Found #{paths_pt1.count} paths when revisiting no small caves"
 paths_pt2 = find_paths do |cave, path|
    case cave
    when /[[:upper:]]/ then true
-   when 'start', 'end' then !path.include?(cave)
-   else path.select { _1 =~ /[[:lower:]]/ }.tally.values.max < 2 || !path.include?(cave)
+   when 'start', 'end' then false
+   else path.select { _1 =~ /[[:lower:]]/ }.tally.values.max < 2
    end
 end
 puts "Found #{paths_pt2.count} paths when revisiting one small cave"
